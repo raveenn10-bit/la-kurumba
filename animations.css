@@ -1,0 +1,291 @@
+/* ==========================================================================
+   LĀ KURUMBA — ADVANCED SCROLL & DIRECTIONAL MOTION SYSTEM
+   High-end editorial transitions: Fade In/Out, Scroll Up/Down, Stagger & Parallax
+   ========================================================================== */
+
+:root {
+  --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-duration: 0.95s;
+  --motion-duration-fast: 0.65s;
+  --motion-duration-slow: 1.25s;
+  --motion-distance: 52px;
+  --motion-distance-sm: 28px;
+  --stagger-delay: 0.12s;
+}
+
+/* --------------------------------------------------------------------------
+   Scroll Progress Bar
+   -------------------------------------------------------------------------- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #9a6540 0%, #b57c55 35%, #d6b58b 70%, #f5e9d3 100%);
+  z-index: 1000;
+  transform: scaleX(0);
+  transform-origin: 0% 50%;
+  will-change: transform;
+  pointer-events: none;
+  box-shadow: 0 1px 12px rgba(214, 181, 139, 0.6);
+  transition: transform 0.05s linear;
+}
+
+/* --------------------------------------------------------------------------
+   Base Reveal & Directional Transitions (JS Enabled)
+   -------------------------------------------------------------------------- */
+.js .reveal,
+.js .scroll-up,
+.js .scroll-down,
+.js .fade-in,
+.js .stagger-reveal > * {
+  opacity: 0;
+  will-change: transform, opacity;
+  transition:
+    opacity var(--motion-duration) var(--motion-ease),
+    transform var(--motion-duration) var(--motion-ease);
+}
+
+/* 1. Standard scroll-up entrance (default for .reveal and .scroll-up):
+      Starts below viewport (+52px), glides up into place. */
+.js .reveal,
+.js .scroll-up,
+.js .reveal.exit-bottom,
+.js .scroll-up.exit-bottom {
+  opacity: 0;
+  transform: translate3d(0, var(--motion-distance), 0);
+}
+
+/* 2. Top exit / Top entrance:
+      When element scrolls past the top, or enters while scrolling up. */
+.js .reveal.exit-top,
+.js .scroll-up.exit-top,
+.js .reveal.passed,
+.js .reveal[data-motion="down"]:not(.visible) {
+  opacity: 0;
+  transform: translate3d(0, calc(var(--motion-distance) * -1), 0);
+}
+
+/* 3. Explicit Scroll-Down Class:
+      Glides downward from above into view. */
+.js .scroll-down {
+  opacity: 0;
+  transform: translate3d(0, calc(var(--motion-distance) * -1), 0);
+}
+.js .scroll-down.exit-bottom {
+  opacity: 0;
+  transform: translate3d(0, var(--motion-distance), 0);
+}
+.js .scroll-down.exit-top {
+  opacity: 0;
+  transform: translate3d(0, calc(var(--motion-distance) * -1), 0);
+}
+
+/* 4. Pure Fade-In / Fade-Out (No positional displacement) */
+.js .fade-in {
+  opacity: 0;
+  transform: none;
+}
+.js .fade-in.exit-top,
+.js .fade-in.exit-bottom,
+.js .fade-out {
+  opacity: 0;
+  transform: none;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease);
+}
+
+/* --------------------------------------------------------------------------
+   In-Viewport (Visible) State — Active Entrance
+   -------------------------------------------------------------------------- */
+.js .reveal.visible,
+.js .reveal.is-visible,
+.js .scroll-up.visible,
+.js .scroll-up.is-visible,
+.js .scroll-down.visible,
+.js .scroll-down.is-visible,
+.js .fade-in.visible,
+.js .fade-in.is-visible,
+.js .stagger-reveal.visible > *,
+.js .stagger-reveal.is-visible > * {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Scale & Depth Entrance Variation */
+.js .reveal[data-effect="scale-up"],
+.js .scale-reveal {
+  opacity: 0;
+  transform: translate3d(0, 36px, 0) scale(0.96);
+  transition:
+    opacity var(--motion-duration) var(--motion-ease),
+    transform var(--motion-duration) var(--motion-ease);
+}
+.js .reveal[data-effect="scale-up"].visible,
+.js .reveal[data-effect="scale-up"].is-visible,
+.js .scale-reveal.visible,
+.js .scale-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+.js .reveal[data-effect="scale-up"].exit-top,
+.js .scale-reveal.exit-top {
+  opacity: 0;
+  transform: translate3d(0, -36px, 0) scale(0.96);
+}
+.js .reveal[data-effect="scale-up"].exit-bottom,
+.js .scale-reveal.exit-bottom {
+  opacity: 0;
+  transform: translate3d(0, 36px, 0) scale(0.96);
+}
+
+/* --------------------------------------------------------------------------
+   Staggered Reveal Sequences
+   -------------------------------------------------------------------------- */
+.js .stagger-reveal > *:nth-child(1),
+.js .reveal[data-stagger="1"] {
+  transition-delay: calc(var(--stagger-delay) * 1);
+}
+.js .stagger-reveal > *:nth-child(2),
+.js .reveal[data-stagger="2"] {
+  transition-delay: calc(var(--stagger-delay) * 2);
+}
+.js .stagger-reveal > *:nth-child(3),
+.js .reveal[data-stagger="3"] {
+  transition-delay: calc(var(--stagger-delay) * 3);
+}
+.js .stagger-reveal > *:nth-child(4),
+.js .reveal[data-stagger="4"] {
+  transition-delay: calc(var(--stagger-delay) * 4);
+}
+.js .stagger-reveal > *:nth-child(5),
+.js .reveal[data-stagger="5"] {
+  transition-delay: calc(var(--stagger-delay) * 5);
+}
+.js .stagger-reveal > *:nth-child(6),
+.js .reveal[data-stagger="6"] {
+  transition-delay: calc(var(--stagger-delay) * 6);
+}
+
+/* Gallery-specific fine delays */
+.gallery .gallery-card:nth-child(1) { transition-delay: 0.05s; }
+.gallery .gallery-card:nth-child(2) { transition-delay: 0.16s; }
+.gallery .gallery-card:nth-child(3) { transition-delay: 0.28s; }
+
+/* Social cards fine delays */
+.social-links .social-card:nth-child(1) { transition-delay: 0.12s; }
+.social-links .social-card:nth-child(2) { transition-delay: 0.24s; }
+
+/* --------------------------------------------------------------------------
+   Scroll Directional Dynamics
+   -------------------------------------------------------------------------- */
+body[data-scroll-direction="down"] .scroll-up:not(.visible):not(.exit-top) {
+  transform: translate3d(0, var(--motion-distance), 0);
+}
+body[data-scroll-direction="up"] .scroll-down:not(.visible):not(.exit-bottom) {
+  transform: translate3d(0, calc(var(--motion-distance) * -1), 0);
+}
+
+/* Header state transition */
+header {
+  transition: transform 0.4s var(--motion-ease), background 0.4s ease, padding 0.4s ease;
+}
+
+/* --------------------------------------------------------------------------
+   Parallax & Organic Motion Surfaces
+   -------------------------------------------------------------------------- */
+.heritage-composition {
+  position: relative;
+  perspective: 1200px;
+}
+.heritage-art img {
+  will-change: transform;
+  transition: transform 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+.heritage-food {
+  will-change: transform;
+  transition: transform 0.25s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.4s ease;
+}
+.heritage-food:hover {
+  box-shadow: 0 28px 60px rgba(23, 40, 35, 0.25);
+}
+
+.pause {
+  overflow: hidden;
+}
+.pause > img {
+  will-change: transform;
+  transform: scale(1.12);
+  transition: transform 0.25s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.food-photo img {
+  will-change: transform;
+  transition: opacity 0.35s ease, transform 0.6s var(--motion-ease);
+}
+
+.gallery-card img {
+  will-change: transform;
+  transition: transform 0.5s var(--motion-ease);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Adjustments
+   -------------------------------------------------------------------------- */
+@media (max-width: 800px) {
+  :root {
+    --motion-distance: 32px;
+    --motion-duration: 0.75s;
+    --stagger-delay: 0.08s;
+  }
+  
+  .js .reveal[data-effect="scale-up"],
+  .js .scale-reveal {
+    transform: translate3d(0, 22px, 0) scale(0.97);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Accessibility: Reduced Motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  
+  .js .reveal,
+  .js .reveal[data-motion="down"],
+  .js .reveal.passed,
+  .js .reveal.exit-top,
+  .js .reveal.exit-bottom,
+  .js .scroll-up,
+  .js .scroll-down,
+  .js .fade-in,
+  .js .scale-reveal,
+  .js .stagger-reveal > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  
+  .scroll-progress {
+    display: none !important;
+  }
+  
+  .hero-img,
+  .hero-content,
+  .heritage-food,
+  .pause > img,
+  .gallery-card img {
+    transform: none !important;
+  }
+}
