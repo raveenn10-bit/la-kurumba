@@ -479,3 +479,65 @@ document.querySelectorAll('dialog').forEach((dialog) => {
     }
   });
 });
+
+
+// ---------------------------------------------------------------------------
+// 6. GOOGLE REVIEWS CATEGORY FILTERING & ACCESSIBILITY
+// ---------------------------------------------------------------------------
+const reviewFilterBtns = document.querySelectorAll('.review-filter-pill');
+const reviewCards = [...document.querySelectorAll('.review-card')];
+const reviewsStatus = document.querySelector('.reviews-status');
+
+if (reviewFilterBtns.length && reviewCards.length) {
+  reviewFilterBtns.forEach((btn, idx) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+
+      // Update button active state & ARIA attributes
+      reviewFilterBtns.forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-selected', String(active));
+        b.tabIndex = active ? 0 : -1;
+      });
+
+      let count = 0;
+      reviewCards.forEach((card) => {
+        const categories = (card.dataset.categories || '').split(' ');
+        const match = filter === 'all' || categories.includes(filter);
+
+        if (match) {
+          card.removeAttribute('hidden');
+          // Ensure entering animation states are cleanly reset for display
+          card.classList.remove('exit-top', 'exit-bottom', 'passed');
+          card.classList.add('visible', 'is-visible');
+          count++;
+        } else {
+          card.setAttribute('hidden', '');
+        }
+      });
+
+      if (reviewsStatus) {
+        const rawText = btn.childNodes[0].textContent.trim();
+        const label = filter === 'all'
+          ? 'all ' + count + ' authentic reviews'
+          : count + ' reviews in ' + rawText;
+        reviewsStatus.textContent = 'Showing ' + label;
+      }
+    });
+
+    // Keyboard navigation (Arrow keys, Home, End)
+    btn.addEventListener('keydown', (e) => {
+      let nextIdx;
+      if (e.key === 'ArrowRight') nextIdx = (idx + 1) % reviewFilterBtns.length;
+      if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + reviewFilterBtns.length) % reviewFilterBtns.length;
+      if (e.key === 'Home') nextIdx = 0;
+      if (e.key === 'End') nextIdx = reviewFilterBtns.length - 1;
+      if (nextIdx !== undefined) {
+        e.preventDefault();
+        reviewFilterBtns[nextIdx].focus();
+        reviewFilterBtns[nextIdx].click();
+      }
+    });
+  });
+}
